@@ -1,0 +1,12 @@
+import { Controller, Get, Post, Put, Delete } from '@nestjs/common';
+import { ArtistService } from './artist.service';
+
+@Controller('artist')
+export class ArtistController {
+  constructor(private readonly artistService: ArtistService) {}
+
+  @Get()
+  getHello(): string {
+    return this.artistService.getHello();
+  }
+}
