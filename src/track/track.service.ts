@@ -1,26 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
+import { Track } from './entities/track.entity';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class TrackService {
+  constructor(private db: InMemoryDatabaseService) {}
+
   create(createTrackDto: CreateTrackDto) {
-    return 'This action adds a new track';
+    const track: Track = new Track();
+    track.id = v4();
+    track.name = createTrackDto.name;
+    track.albumId = track.albumId;
+    track.artistId = track.artistId;
+    track.duration = track.duration;
+    return this.db.createNewTrack(track);
   }
 
   findAll() {
-    return `This action returns all track`;
+    return this.db.getAllTracks();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} track`;
+  findOne(id: string) {
+    return this.db.getTrackById(id);
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
+  update(id: string, updateTrackDto: UpdateTrackDto) {
     return `This action updates a #${id} track`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
+    this.db.removeTrack(id);
     return `This action removes a #${id} track`;
   }
 }
