@@ -4,6 +4,7 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
 import { Track } from './entities/track.entity';
 import { v4 } from 'uuid';
+import { checkRecordExists, checkUUID } from 'src/utils/utils';
 
 @Injectable()
 export class TrackService {
@@ -24,14 +25,20 @@ export class TrackService {
   }
 
   findOne(id: string) {
+    checkUUID(id);
+    checkRecordExists(id, 'track', this.db);
     return this.db.getTrackById(id);
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
+    checkUUID(id);
+    checkRecordExists(id, 'track', this.db);
     return `This action updates a #${id} track`;
   }
 
   remove(id: string) {
+    checkUUID(id);
+    checkRecordExists(id, 'track', this.db);
     this.db.removeTrack(id);
     return `This action removes a #${id} track`;
   }

@@ -4,6 +4,7 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
 import { Artist } from './entities/artist.entity';
 import { v4 } from 'uuid';
+import { checkRecordExists, checkUUID } from 'src/utils/utils';
 
 @Injectable()
 export class ArtistService {
@@ -22,14 +23,20 @@ export class ArtistService {
   }
 
   findOne(id: string) {
+    checkUUID(id);
+    checkRecordExists(id, 'artist', this.db);
     return this.db.getArtistById(id);
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
+    checkUUID(id);
+    checkRecordExists(id, 'artist', this.db);
     return `This action updates a #${id} artist`;
   }
 
   remove(id: string) {
+    checkUUID(id);
+    checkRecordExists(id, 'artist', this.db);
     this.db.removeArtist(id);
     return `This action removes a #${id} artist`;
   }

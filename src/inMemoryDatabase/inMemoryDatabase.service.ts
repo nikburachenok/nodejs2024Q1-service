@@ -117,4 +117,19 @@ export class InMemoryDatabaseService {
     this.artists.splice(indexToRemove, 1);
     return id;
   }
+
+  checkRecordExists(id: string, type: string) {
+    let result: number;
+    if (type === 'user') {
+      result = this.users.findIndex((item) => item.id === id);
+    } else if (type === 'album') {
+      result = this.albums.findIndex((item) => item.id === id);
+    } else if (type === 'artist') {
+      result = this.artists.findIndex((item) => item.id === id);
+    } else if (type === 'track') {
+      result = this.tracks.findIndex((item) => item.id === id);
+    }
+
+    return result;
+  }
 }
