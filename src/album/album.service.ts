@@ -4,7 +4,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
 import { Album } from './entities/album.entity';
 import { v4 } from 'uuid';
-import { checkRecordExists, checkUUID, validateBody } from 'src/utils/utils';
+import { checkRecordExists, checkUUID } from 'src/utils/utils';
 import { validate } from 'class-validator';
 
 @Injectable()
@@ -12,7 +12,6 @@ export class AlbumService {
   constructor(private db: InMemoryDatabaseService) {}
 
   async create(createAlbumDto: CreateAlbumDto) {
-    // validateBody(createAlbumDto);
     const errors = await validate(new CreateAlbumDto(createAlbumDto));
     if (errors.length > 0) {
       throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
@@ -31,7 +30,7 @@ export class AlbumService {
 
   findOne(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'album', this.db);
+    checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);
     return this.db.getAlbumById(id);
   }
 
@@ -41,7 +40,7 @@ export class AlbumService {
       throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
-    checkRecordExists(id, 'album', this.db);
+    checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);
 
     const album: Album = new Album();
     album.id = id;
@@ -53,7 +52,7 @@ export class AlbumService {
 
   remove(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'album', this.db);
+    checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);
     this.db.removeAlbum(id);
     this.db.clearRemovedAlbum(id);
     return `This action removes a #${id} album`;

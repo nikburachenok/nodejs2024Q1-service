@@ -1,26 +1,81 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
+import { checkRecordExists, checkUUID } from 'src/utils/utils';
 
 @Injectable()
 export class FavoriteService {
-  create(createFavoriteDto: CreateFavoriteDto) {
-    return 'This action adds a new favorite';
-  }
+  constructor(private db: InMemoryDatabaseService) {}
 
   findAll() {
-    return `This action returns all favorite`;
+    return this.db.getFavorites();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
+  addNewTrack(trackId: string) {
+    checkUUID(trackId);
+    checkRecordExists(
+      trackId,
+      'track',
+      this.db,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+    this.db.addNewTrackToFavorites(trackId);
+    return `The track with id ${trackId} was successfully added to the favorites`;
   }
 
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
+  removeTrack(trackId: string) {
+    checkUUID(trackId);
+    checkRecordExists(
+      trackId,
+      'track',
+      this.db,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+    return this.db.removeTrackFromFavorites(trackId);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} favorite`;
+  addNewAlbum(albumId: string) {
+    checkUUID(albumId);
+    checkRecordExists(
+      albumId,
+      'album',
+      this.db,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+    this.db.addNewAlbumToFavorites(albumId);
+    return `The album with id ${albumId} was successfully added to the favorites`;
+  }
+
+  removeAlbum(albumId: string) {
+    checkUUID(albumId);
+    checkRecordExists(
+      albumId,
+      'album',
+      this.db,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+    return this.db.removeAlbumFromFavorites(albumId);
+  }
+
+  addNewArtist(artistId: string) {
+    checkUUID(artistId);
+    checkRecordExists(
+      artistId,
+      'artist',
+      this.db,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+    this.db.addNewArtistToFavorites(artistId);
+    return `The artist with id ${artistId} was successfully added to the favorites`;
+  }
+
+  removeArtist(artistId: string) {
+    checkUUID(artistId);
+    checkRecordExists(
+      artistId,
+      'artist',
+      this.db,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+    return this.db.removeArtistFromFavorites(artistId);
   }
 }

@@ -4,7 +4,7 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
 import { Track } from './entities/track.entity';
 import { v4 } from 'uuid';
-import { checkRecordExists, checkUUID, validateBody } from 'src/utils/utils';
+import { checkRecordExists, checkUUID } from 'src/utils/utils';
 import { validate } from 'class-validator';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class TrackService {
 
   findOne(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'track', this.db);
+    checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
     return this.db.getTrackById(id);
   }
 
@@ -42,7 +42,7 @@ export class TrackService {
       throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
-    checkRecordExists(id, 'track', this.db);
+    checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
 
     const track: Track = new Track();
     track.id = id;
@@ -55,8 +55,9 @@ export class TrackService {
 
   remove(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'track', this.db);
+    checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
     this.db.removeTrack(id);
+    this.db.clearRemovedTrack(id);
     return `This action removes a #${id} track`;
   }
 }

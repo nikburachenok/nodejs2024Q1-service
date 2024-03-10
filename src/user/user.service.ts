@@ -5,7 +5,7 @@ import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.s
 import { User } from './entities/user.entity';
 import { v4 } from 'uuid';
 import { UserResponse } from './entities/userResponse.entity';
-import { checkRecordExists, checkUUID, validateBody } from 'src/utils/utils';
+import { checkRecordExists, checkUUID } from 'src/utils/utils';
 import { validate } from 'class-validator';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class UserService {
 
   findOne(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'user', this.db);
+    checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
     const user: User = this.db.getUserById(id);
     return new UserResponse(user);
   }
@@ -49,7 +49,7 @@ export class UserService {
       throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
-    checkRecordExists(id, 'user', this.db);
+    checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
 
     if (updateUserDto.oldPassword === this.db.getUserPasswordById(id)) {
       const newUser: User = this.db.updateUser(id, updateUserDto.newPassword);
@@ -61,7 +61,7 @@ export class UserService {
 
   remove(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'user', this.db);
+    checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
     this.db.removeUser(id);
     return `This action removes a #${id} user`;
   }

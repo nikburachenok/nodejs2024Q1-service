@@ -3,6 +3,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Artist } from 'src/artist/entities/artist.entity';
 import { Track } from 'src/track/entities/track.entity';
 import { Album } from 'src/album/entities/album.entity';
+import { Favorite } from 'src/favorite/entities/favorite.entity';
 
 @Injectable()
 export class InMemoryDatabaseService {
@@ -10,12 +11,14 @@ export class InMemoryDatabaseService {
   albums: Array<Album>;
   tracks: Array<Track>;
   artists: Array<Artist>;
+  favorite: Favorite;
 
   constructor() {
     this.users = new Array<User>();
     this.albums = new Array<Album>();
     this.tracks = new Array<Track>();
     this.artists = new Array<Artist>();
+    this.favorite = new Favorite();
   }
 
   getAllUsers() {
@@ -144,6 +147,10 @@ export class InMemoryDatabaseService {
     tracks.forEach((item) => {
       item.artistId = null;
     });
+
+    if (this.favorite.artists.findIndex((item) => item.id === artistId) >= 0) {
+      this.removeArtistFromFavorites(artistId);
+    }
   }
 
   clearRemovedAlbum(albumId: string) {
@@ -151,9 +158,58 @@ export class InMemoryDatabaseService {
     tracks.forEach((item) => {
       item.albumId = null;
     });
+
+    if (this.favorite.albums.findIndex((item) => item.id === albumId) >= 0) {
+      this.removeAlbumFromFavorites(albumId);
+    }
+  }
+
+  clearRemovedTrack(trackId: string) {
+    if (this.favorite.tracks.findIndex((item) => item.id === trackId) >= 0) {
+      this.removeTrackFromFavorites(trackId);
+    }
   }
 
   getUserPasswordById(userId: string) {
     return this.users.find((item) => item.id === userId).password;
+  }
+
+  getFavorites() {
+    return this.favorite;
+  }
+
+  addNewTrackToFavorites(trackId: string) {
+    this.favorite.tracks.push(this.tracks.find((item) => item.id === trackId));
+  }
+
+  addNewAlbumToFavorites(albumId: string) {
+    this.favorite.albums.push(this.albums.find((item) => item.id === albumId));
+  }
+
+  addNewArtistToFavorites(artistId: string) {
+    this.favorite.artists.push(
+      this.artists.find((item) => item.id === artistId),
+    );
+  }
+
+  removeTrackFromFavorites(trackId: string) {
+    const trackIndex = this.favorite.tracks.findIndex(
+      (item) => item.id === trackId,
+    );
+    this.favorite.tracks.splice(trackIndex, 1);
+  }
+
+  removeAlbumFromFavorites(albumId: string) {
+    const albumIndex = this.favorite.albums.findIndex(
+      (item) => item.id === albumId,
+    );
+    this.favorite.albums.splice(albumIndex, 1);
+  }
+
+  removeArtistFromFavorites(artistId: string) {
+    const artistIndex = this.favorite.artists.findIndex(
+      (item) => item.id === artistId,
+    );
+    this.favorite.artists.splice(artistIndex, 1);
   }
 }
