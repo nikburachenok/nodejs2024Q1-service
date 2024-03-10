@@ -16,4 +16,11 @@ export class UpdateTrackDto {
   @IsNumber()
   @IsOptional()
   duration: number;
+
+  constructor(dto: UpdateTrackDto) {
+    this.name = dto.name;
+    this.artistId = dto.artistId;
+    this.albumId = dto.albumId;
+    this.duration = dto.duration;
+  }
 }

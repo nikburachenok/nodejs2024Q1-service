@@ -8,4 +8,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  constructor(dto: CreateUserDto) {
+    this.login = dto.login;
+    this.password = dto.password;
+  }
 }

@@ -10,4 +10,9 @@ export class UpdateArtistDto {
   @IsBoolean()
   @IsOptional()
   grammy: boolean;
+
+  constructor(dto: UpdateArtistDto) {
+    this.name = dto.name;
+    this.grammy = dto.grammy;
+  }
 }

@@ -7,4 +7,9 @@ export class CreateArtistDto {
   @IsNotEmpty()
   @IsBoolean()
   grammy: boolean;
+
+  constructor(dto: CreateArtistDto) {
+    this.name = dto.name;
+    this.grammy = dto.grammy;
+  }
 }

@@ -31,10 +31,12 @@ export class InMemoryDatabaseService {
     return user;
   }
 
-  updateUser(id: string, user: User) {
-    let oldUser = this.users.find((item) => item.id === id);
-    oldUser = user;
-    return oldUser;
+  updateUser(id: string, password: string) {
+    const user = this.users.find((item) => item.id === id);
+    user.password = password;
+    ++user.version;
+    user.updatedAt = Date.now();
+    return user;
   }
 
   removeUser(id: string) {
@@ -131,5 +133,27 @@ export class InMemoryDatabaseService {
     }
 
     return result;
+  }
+
+  clearRemovedArtist(artistId: string) {
+    const albums = this.albums.filter((item) => item.artistId === artistId);
+    albums.forEach((item) => {
+      item.artistId = null;
+    });
+    const tracks = this.tracks.filter((item) => item.artistId === artistId);
+    tracks.forEach((item) => {
+      item.artistId = null;
+    });
+  }
+
+  clearRemovedAlbum(albumId: string) {
+    const tracks = this.tracks.filter((item) => item.albumId === albumId);
+    tracks.forEach((item) => {
+      item.albumId = null;
+    });
+  }
+
+  getUserPasswordById(userId: string) {
+    return this.users.find((item) => item.id === userId).password;
   }
 }

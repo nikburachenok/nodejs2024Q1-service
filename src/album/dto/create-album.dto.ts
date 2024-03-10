@@ -18,4 +18,10 @@ export class CreateAlbumDto {
   @IsOptional()
   @IsUUID()
   artistId: string | null;
+
+  constructor(dto: CreateAlbumDto) {
+    this.name = dto.name;
+    this.year = dto.year;
+    this.artistId = dto.artistId;
+  }
 }

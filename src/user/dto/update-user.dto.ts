@@ -8,4 +8,9 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsString()
   newPassword: string;
+
+  constructor(dto: UpdateUserDto) {
+    this.oldPassword = dto.oldPassword;
+    this.newPassword = dto.newPassword;
+  }
 }
