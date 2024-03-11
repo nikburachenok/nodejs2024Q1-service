@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { ArtistModule } from './artist/artist.module';
 import { TrackModule } from './track/track.module';
@@ -17,6 +16,6 @@ import { InMemoryDatabaseModule } from './inMemoryDatabase/inMemoryDatabase.modu
     InMemoryDatabaseModule,
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
