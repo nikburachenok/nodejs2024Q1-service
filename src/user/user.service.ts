@@ -15,7 +15,15 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const errors = await validate(new CreateUserDto(createUserDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
 
     if (this.db.getUserByLogin(createUserDto.login)) {
@@ -53,7 +61,15 @@ export class UserService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     const errors = await validate(new UpdateUserDto(updateUserDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
     checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);

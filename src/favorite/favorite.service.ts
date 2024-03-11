@@ -28,12 +28,7 @@ export class FavoriteService {
 
   removeTrack(trackId: string) {
     checkUUID(trackId);
-    checkRecordExists(
-      trackId,
-      'track',
-      this.db,
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
+    checkRecordExists(trackId, 'track', this.db, HttpStatus.NOT_FOUND);
     if (!this.db.getTrackFromFavoritesById(trackId)) {
       throw new HttpException(
         'This record is not found in the favorites',
@@ -61,12 +56,7 @@ export class FavoriteService {
 
   removeAlbum(albumId: string) {
     checkUUID(albumId);
-    checkRecordExists(
-      albumId,
-      'album',
-      this.db,
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
+    checkRecordExists(albumId, 'album', this.db, HttpStatus.NOT_FOUND);
     if (!this.db.getAlbumFromFavoritesById(albumId)) {
       throw new HttpException(
         'This record is not found in the favorites',
@@ -94,12 +84,7 @@ export class FavoriteService {
 
   removeArtist(artistId: string) {
     checkUUID(artistId);
-    checkRecordExists(
-      artistId,
-      'artist',
-      this.db,
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
+    checkRecordExists(artistId, 'artist', this.db, HttpStatus.NOT_FOUND);
     if (!this.db.getArtistFromFavoritesById(artistId)) {
       throw new HttpException(
         'This record is not found in the favorites',

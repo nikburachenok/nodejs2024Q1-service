@@ -14,7 +14,15 @@ export class AlbumService {
   async create(createAlbumDto: CreateAlbumDto) {
     const errors = await validate(new CreateAlbumDto(createAlbumDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     const album: Album = new Album();
     album.id = v4();
@@ -37,7 +45,15 @@ export class AlbumService {
   async update(id: string, updateAlbumDto: UpdateAlbumDto) {
     const errors = await validate(new UpdateAlbumDto(updateAlbumDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
     checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);

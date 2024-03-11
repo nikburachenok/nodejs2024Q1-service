@@ -14,7 +14,15 @@ export class ArtistService {
   async create(createArtistDto: CreateArtistDto) {
     const errors = await validate(new CreateArtistDto(createArtistDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
 
     const artist: Artist = new Artist();
@@ -37,7 +45,15 @@ export class ArtistService {
   async update(id: string, updateArtistDto: UpdateArtistDto) {
     const errors = await validate(new UpdateArtistDto(updateArtistDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
     checkRecordExists(id, 'artist', this.db, HttpStatus.NOT_FOUND);

@@ -14,7 +14,15 @@ export class TrackService {
   async create(createTrackDto: CreateTrackDto) {
     const errors = await validate(new CreateTrackDto(createTrackDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
 
     const track: Track = new Track();
@@ -39,7 +47,15 @@ export class TrackService {
   async update(id: string, updateTrackDto: UpdateTrackDto) {
     const errors = await validate(new UpdateTrackDto(updateTrackDto));
     if (errors.length > 0) {
-      throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
+      let error = '';
+      errors.forEach((item) => {
+        if (item.constraints) {
+          for (const key in item.constraints) {
+            error += `${item.constraints[key]}; `;
+          }
+        }
+      });
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
     checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
