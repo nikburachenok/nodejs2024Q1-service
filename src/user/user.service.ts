@@ -18,6 +18,13 @@ export class UserService {
       throw new HttpException('Wrong body', HttpStatus.BAD_REQUEST);
     }
 
+    if (this.db.getUserByLogin(createUserDto.login)) {
+      throw new HttpException(
+        'User with this login exists. Please, try to use another login',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const user: User = new User();
     user.id = v4();
     user.login = createUserDto.login;
@@ -52,6 +59,12 @@ export class UserService {
     checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
 
     if (updateUserDto.oldPassword === this.db.getUserPasswordById(id)) {
+      if (updateUserDto.oldPassword === updateUserDto.newPassword) {
+        throw new HttpException(
+          'The old password and the new password cannot by the same',
+          HttpStatus.FORBIDDEN,
+        );
+      }
       const newUser: User = this.db.updateUser(id, updateUserDto.newPassword);
       return new UserResponse(newUser);
     } else {

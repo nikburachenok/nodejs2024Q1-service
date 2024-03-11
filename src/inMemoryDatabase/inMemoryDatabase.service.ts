@@ -174,6 +174,10 @@ export class InMemoryDatabaseService {
     return this.users.find((item) => item.id === userId).password;
   }
 
+  getUserByLogin(userName: string): boolean {
+    return !!this.users.find((item) => item.login === userName);
+  }
+
   getFavorites() {
     return this.favorite;
   }
