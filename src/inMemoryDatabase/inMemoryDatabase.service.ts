@@ -196,6 +196,18 @@ export class InMemoryDatabaseService {
     );
   }
 
+  getTrackFromFavoritesById(trackId: string): boolean {
+    return !!this.favorite.tracks.find((item) => item.id === trackId);
+  }
+
+  getAlbumFromFavoritesById(albumId: string): boolean {
+    return !!this.favorite.albums.find((item) => item.id === albumId);
+  }
+
+  getArtistFromFavoritesById(artistId: string): boolean {
+    return !!this.favorite.artists.find((item) => item.id === artistId);
+  }
+
   removeTrackFromFavorites(trackId: string) {
     const trackIndex = this.favorite.tracks.findIndex(
       (item) => item.id === trackId,

@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
 import { checkRecordExists, checkUUID } from 'src/utils/utils';
 
@@ -18,8 +18,12 @@ export class FavoriteService {
       this.db,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
-    this.db.addNewTrackToFavorites(trackId);
-    return `The track with id ${trackId} was successfully added to the favorites`;
+    if (this.db.getTrackFromFavoritesById(trackId)) {
+      return `The track with id ${trackId} has already been added to the favorites.`;
+    } else {
+      this.db.addNewTrackToFavorites(trackId);
+      return `The track with id ${trackId} was successfully added to the favorites`;
+    }
   }
 
   removeTrack(trackId: string) {
@@ -30,6 +34,12 @@ export class FavoriteService {
       this.db,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
+    if (!this.db.getTrackFromFavoritesById(trackId)) {
+      throw new HttpException(
+        'This record is not found in the favorites',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return this.db.removeTrackFromFavorites(trackId);
   }
 
@@ -41,8 +51,12 @@ export class FavoriteService {
       this.db,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
-    this.db.addNewAlbumToFavorites(albumId);
-    return `The album with id ${albumId} was successfully added to the favorites`;
+    if (this.db.getAlbumFromFavoritesById(albumId)) {
+      return `The album with id ${albumId} has already been added to the favorites.`;
+    } else {
+      this.db.addNewAlbumToFavorites(albumId);
+      return `The album with id ${albumId} was successfully added to the favorites`;
+    }
   }
 
   removeAlbum(albumId: string) {
@@ -53,6 +67,12 @@ export class FavoriteService {
       this.db,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
+    if (!this.db.getAlbumFromFavoritesById(albumId)) {
+      throw new HttpException(
+        'This record is not found in the favorites',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return this.db.removeAlbumFromFavorites(albumId);
   }
 
@@ -64,8 +84,12 @@ export class FavoriteService {
       this.db,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
-    this.db.addNewArtistToFavorites(artistId);
-    return `The artist with id ${artistId} was successfully added to the favorites`;
+    if (this.db.getArtistFromFavoritesById(artistId)) {
+      return `The artist with id ${artistId} has already been added to the favorites.`;
+    } else {
+      this.db.addNewArtistToFavorites(artistId);
+      return `The artist with id ${artistId} was successfully added to the favorites`;
+    }
   }
 
   removeArtist(artistId: string) {
@@ -76,6 +100,12 @@ export class FavoriteService {
       this.db,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
+    if (!this.db.getArtistFromFavoritesById(artistId)) {
+      throw new HttpException(
+        'This record is not found in the favorites',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return this.db.removeArtistFromFavorites(artistId);
   }
 }
