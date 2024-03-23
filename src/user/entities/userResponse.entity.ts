@@ -1,4 +1,4 @@
-import { User } from './user.entity';
+import { User } from '@prisma/client';
 
 export class UserResponse {
   id: string;
@@ -11,7 +11,7 @@ export class UserResponse {
     this.id = user.id;
     this.login = user.login;
     this.version = user.version;
-    this.createdAt = user.createdAt;
-    this.updatedAt = user.updatedAt;
+    this.createdAt = new Date(user.createdAt).getTime();
+    this.updatedAt = new Date(user.updatedAt).getTime();
   }
 }

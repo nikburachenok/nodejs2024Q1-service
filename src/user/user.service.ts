@@ -1,16 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
-import { User } from './entities/user.entity';
-import { v4 } from 'uuid';
+import { DbService } from 'src/db/db.service';
 import { UserResponse } from './entities/userResponse.entity';
-import { checkRecordExists, checkUUID } from 'src/utils/utils';
+import { checkUUID } from 'src/utils/utils';
 import { validate } from 'class-validator';
 
 @Injectable()
 export class UserService {
-  constructor(private db: InMemoryDatabaseService) {}
+  constructor(private db: DbService) {}
 
   async create(createUserDto: CreateUserDto) {
     const errors = await validate(new CreateUserDto(createUserDto));
@@ -26,35 +24,33 @@ export class UserService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
 
-    if (this.db.getUserByLogin(createUserDto.login)) {
+    if (
+      await this.db.user.findUnique({ where: { login: createUserDto.login } })
+    ) {
       throw new HttpException(
         'User with this login exists. Please, try to use another login',
         HttpStatus.FORBIDDEN,
       );
     }
 
-    const user: User = new User();
-    user.id = v4();
-    user.login = createUserDto.login;
-    user.password = createUserDto.password;
-    user.version = 1;
-    user.createdAt = user.updatedAt = Date.now();
-    const newUser: User = this.db.createNewUser(user);
-    return new UserResponse(newUser);
+    const user = await this.db.user.create({ data: createUserDto });
+    return new UserResponse(user);
   }
 
-  findAll() {
+  async findAll() {
     const userResponses = new Array<UserResponse>();
-    this.db.getAllUsers().forEach((item) => {
+    (await this.db.user.findMany()).forEach((item) => {
       userResponses.push(new UserResponse(item));
     });
     return userResponses;
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
-    const user: User = this.db.getUserById(id);
+    const user = await this.db.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new HttpException('Record does not exist', HttpStatus.NOT_FOUND);
+    }
     return new UserResponse(user);
   }
 
@@ -72,26 +68,35 @@ export class UserService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
-    checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
+    await this.findOne(id);
 
-    if (updateUserDto.oldPassword === this.db.getUserPasswordById(id)) {
+    if (
+      updateUserDto.oldPassword ===
+      (await this.db.user.findUnique({ where: { id } })).password
+    ) {
       if (updateUserDto.oldPassword === updateUserDto.newPassword) {
         throw new HttpException(
           'The old password and the new password cannot by the same',
           HttpStatus.FORBIDDEN,
         );
       }
-      const newUser: User = this.db.updateUser(id, updateUserDto.newPassword);
+      const newUser = await this.db.user.update({
+        where: { id },
+        data: {
+          version: { increment: 1 },
+          password: updateUserDto.newPassword,
+        },
+      });
       return new UserResponse(newUser);
     } else {
       throw new HttpException('Wrong old password', HttpStatus.FORBIDDEN);
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'user', this.db, HttpStatus.NOT_FOUND);
-    this.db.removeUser(id);
+    await this.findOne(id);
+    this.db.user.delete({ where: { id } });
     return `This action removes a #${id} user`;
   }
 }
