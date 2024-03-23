@@ -24,15 +24,6 @@ export class UserService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
 
-    if (
-      await this.db.user.findUnique({ where: { login: createUserDto.login } })
-    ) {
-      throw new HttpException(
-        'User with this login exists. Please, try to use another login',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     const user = await this.db.user.create({ data: createUserDto });
     return new UserResponse(user);
   }
@@ -96,7 +87,7 @@ export class UserService {
   async remove(id: string) {
     checkUUID(id);
     await this.findOne(id);
-    this.db.user.delete({ where: { id } });
+    await this.db.user.delete({ where: { id } });
     return `This action removes a #${id} user`;
   }
 }
