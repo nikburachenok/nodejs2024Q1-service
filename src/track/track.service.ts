@@ -1,15 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
+import { DbService } from 'src/db/db.service';
 import { Track } from './entities/track.entity';
-import { v4 } from 'uuid';
-import { checkRecordExists, checkUUID } from 'src/utils/utils';
+import { checkUUID } from 'src/utils/utils';
 import { validate } from 'class-validator';
 
 @Injectable()
 export class TrackService {
-  constructor(private db: InMemoryDatabaseService) {}
+  constructor(private db: DbService) {}
 
   async create(createTrackDto: CreateTrackDto) {
     const errors = await validate(new CreateTrackDto(createTrackDto));
@@ -26,22 +25,24 @@ export class TrackService {
     }
 
     const track: Track = new Track();
-    track.id = v4();
     track.name = createTrackDto.name;
     track.albumId = createTrackDto.albumId;
     track.artistId = createTrackDto.artistId;
     track.duration = createTrackDto.duration;
-    return this.db.createNewTrack(track);
+    return await this.db.track.create({ data: track });
   }
 
-  findAll() {
-    return this.db.getAllTracks();
+  async findAll() {
+    return await this.db.track.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
-    return this.db.getTrackById(id);
+    const track = await this.db.track.findUnique({ where: { id } });
+    if (!track) {
+      throw new HttpException('Record does not exist', HttpStatus.NOT_FOUND);
+    }
+    return track;
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto) {
@@ -58,7 +59,7 @@ export class TrackService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
-    checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
+    await this.findOne(id);
 
     const track: Track = new Track();
     track.id = id;
@@ -66,14 +67,12 @@ export class TrackService {
     track.albumId = updateTrackDto.albumId;
     track.artistId = updateTrackDto.artistId;
     track.duration = updateTrackDto.duration;
-    return this.db.updateTrack(id, track);
+    return this.db.track.update({ where: { id }, data: track });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'track', this.db, HttpStatus.NOT_FOUND);
-    this.db.removeTrack(id);
-    this.db.clearRemovedTrack(id);
-    return `This action removes a #${id} track`;
+    await this.findOne(id);
+    return await this.db.track.delete({ where: { id } });
   }
 }

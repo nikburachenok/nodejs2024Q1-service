@@ -42,7 +42,7 @@ model Album {
 model Track {
   id       String  @id @default(uuid())
   name     String  @db.VarChar(255)
-  year     Int
+  duration Int
   artistId String?
   artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
   albumId  String?

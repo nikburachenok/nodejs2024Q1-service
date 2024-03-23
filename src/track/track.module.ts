@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { TrackController } from './track.controller';
-import { InMemoryDatabaseModule } from 'src/inMemoryDatabase/inMemoryDatabase.module';
+import { DbModule } from 'src/db/db.module';
 
 @Module({
-  imports: [InMemoryDatabaseModule],
+  imports: [DbModule],
   controllers: [TrackController],
   providers: [TrackService],
 })
