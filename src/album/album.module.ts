@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { AlbumController } from './album.controller';
-import { InMemoryDatabaseModule } from 'src/inMemoryDatabase/inMemoryDatabase.module';
+import { DbModule } from 'src/db/db.module';
 
 @Module({
-  imports: [InMemoryDatabaseModule],
+  imports: [DbModule],
   controllers: [AlbumController],
   providers: [AlbumService],
 })

@@ -1,15 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { InMemoryDatabaseService } from 'src/inMemoryDatabase/inMemoryDatabase.service';
+import { DbService } from 'src/db/db.service';
 import { Album } from './entities/album.entity';
-import { v4 } from 'uuid';
-import { checkRecordExists, checkUUID } from 'src/utils/utils';
+import { checkUUID } from 'src/utils/utils';
 import { validate } from 'class-validator';
 
 @Injectable()
 export class AlbumService {
-  constructor(private db: InMemoryDatabaseService) {}
+  constructor(private db: DbService) {}
 
   async create(createAlbumDto: CreateAlbumDto) {
     const errors = await validate(new CreateAlbumDto(createAlbumDto));
@@ -25,21 +24,23 @@ export class AlbumService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     const album: Album = new Album();
-    album.id = v4();
     album.name = createAlbumDto.name;
     album.year = createAlbumDto.year;
     album.artistId = createAlbumDto.artistId;
-    return this.db.createNewAlbum(album);
+    return await this.db.album.create({ data: album });
   }
 
-  findAll() {
-    return this.db.getAllAlbums();
+  async findAll() {
+    return await this.db.album.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);
-    return this.db.getAlbumById(id);
+    const album = await this.db.album.findUnique({ where: { id } });
+    if (!album) {
+      throw new HttpException('Record does not exist', HttpStatus.NOT_FOUND);
+    }
+    return album;
   }
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto) {
@@ -56,21 +57,19 @@ export class AlbumService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
     checkUUID(id);
-    checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);
+    await this.findOne(id);
 
     const album: Album = new Album();
     album.id = id;
     album.name = updateAlbumDto.name;
     album.artistId = updateAlbumDto.artistId;
     album.year = updateAlbumDto.year;
-    return this.db.updateAlbum(id, album);
+    return await this.db.album.update({ where: { id }, data: album });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     checkUUID(id);
-    checkRecordExists(id, 'album', this.db, HttpStatus.NOT_FOUND);
-    this.db.removeAlbum(id);
-    this.db.clearRemovedAlbum(id);
-    return `This action removes a #${id} album`;
+    await this.findOne(id);
+    return await this.db.album.delete({ where: { id } });
   }
 }
