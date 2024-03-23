@@ -5,6 +5,7 @@ import { TrackModule } from './track/track.module';
 import { AlbumModule } from './album/album.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { InMemoryDatabaseModule } from './inMemoryDatabase/inMemoryDatabase.module';
+import { DbModule } from './db/db.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { InMemoryDatabaseModule } from './inMemoryDatabase/inMemoryDatabase.modu
     TrackModule,
     AlbumModule,
     FavoriteModule,
+    DbModule,
     InMemoryDatabaseModule,
   ],
   controllers: [],
