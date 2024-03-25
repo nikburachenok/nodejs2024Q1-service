@@ -4,14 +4,38 @@ version: '3.8'
 services:
 
   postgres:
-    image: postgres:13.5
+    image: postgres:latest
     restart: always
     env_file:
       - .env
+    networks:
+      - net
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '${DATABASE_PORT}:${DATABASE_PORT}'
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - net
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      postgres:
+        condition: service_started
 
 volumes:
   postgres:
+
+networks:
+  net:
+    driver: bridge
