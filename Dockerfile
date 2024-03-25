@@ -1,6 +1,6 @@
 FROM node:20.11.1-alpine as build
 
-WORKDIR /app
+WORKDIR /user/app
 
 COPY package*.json .
 
@@ -10,9 +10,9 @@ COPY . .
 
 FROM node:20.11.1-alpine as main
 
-WORKDIR /app
+WORKDIR /user/app
 
-COPY --from=build /app /app
+COPY --from=build /user/app /user/app
 
 EXPOSE ${PORT}
 

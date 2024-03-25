@@ -33,7 +33,7 @@ services:
     ports:
       - ${PORT}:${PORT}
     volumes:
-      - ./src:/app/src
+      - ./src:/user/app/src
     depends_on:
       postgres:
         condition: service_started
