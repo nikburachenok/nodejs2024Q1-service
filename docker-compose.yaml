@@ -4,9 +4,10 @@ version: '3.8'
 services:
 
   postgres:
-    image: postgres
+    image: nikolayburachenok/home-library-db-1
+    container_name: 'postgres'
     build:
-      context: .db
+      context: ./db
       dockerfile: Dockerfile
     restart: always
     env_file:
@@ -22,6 +23,8 @@ services:
 
 
   app:
+    image: nikolayburachenok/home-library-app-1
+    container_name: 'app'
     build:
       context: .
       dockerfile: Dockerfile
