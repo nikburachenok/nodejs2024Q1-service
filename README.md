@@ -5,11 +5,8 @@
 2. Install npm modules using ```npm install```
 
 ## Running application
-Application works in the following modes:
-1. Common mode: ```npm run start```.
-2. Dev mode (reflect all the code changes automatically): ```npm run start:dev```.
-3. Debug mode (as dev mode but with --inspect flag): ```npm run start:debug```.
-4. Production mode (launch compiled version from dist folder): ```npm run start:prod```. Before launch this command use ```npm run build``` to compile application. To remove dist folder use ```npm run prebuild```.
+To start application use following command:
+1. Common mode: ```npm run start:docker```.
 
 ## Setting application port
 You can use .env file to set port for application. To do this you need to change the PORT environment. By default port is 4000.
