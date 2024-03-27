@@ -8,6 +8,14 @@
 
 ## Setting application port
 You can use .env file to set port for application. To do this you need to change the PORT environment. By default port is 4000.
+To use application you need to add following variables in the .env file:
+```bash
+DATABASE_PORT=5432
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=mypassword
+POSTGRES_HOST=postgres
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${DATABASE_PORT}/mydb?schema=public"
+```
 
 ## Running application
 To run application you need to have an account on Docker Hub, Docker Desktop application installed and launched on your laptop.
