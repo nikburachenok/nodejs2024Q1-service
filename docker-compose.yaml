@@ -1,0 +1,49 @@
+# docker-compose.yaml
+
+version: '3.8'
+services:
+
+  postgres:
+    image: nikolayburachenok/home-library-db-1
+    container_name: 'postgres'
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - net
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    command:
+      ['postgres', '-c', 'logging_collector=on']
+    ports:
+      - '${DATABASE_PORT}:${DATABASE_PORT}'
+
+
+  app:
+    image: nikolayburachenok/home-library-app-1
+    container_name: 'app'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - net
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./src:/user/app/src
+    depends_on:
+      postgres:
+        condition: service_started
+
+volumes:
+  postgres:
+
+networks:
+  net:
+    driver: bridge
